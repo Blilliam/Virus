@@ -1,25 +1,27 @@
 import random
 from turtle import width
 import pygame
+from playScene import PlayScene
 from box import Box
 from center import Center
 from config import Config
 from graph import Graph
+from menuScene import MenuScene
 import person
 from person import Person
 from pulse import Pulse
 
 class Game:
-    def __init__(self):
-        c = Config.load()
+    def __init__(self, screen_width, screen_height):
 
-        boxHeight = c.get("box", "height")
-        boxWidth = c.get("box", "width")
+        self.c = Config.load()
+
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        self.infectionRate = self.c.get("person", "infectionRate")
 
         self.simulation_boxes = []
-
-        self.add_box(Box(50, 50, boxWidth, boxHeight, self))
-        self.add_box(Box(50, 600, boxWidth, boxHeight, self))
 
         self.center = Center(800, 400, 100, 100)
 
@@ -32,42 +34,41 @@ class Game:
 
         self.graph = Graph(self, 600, 600, 400, 400)
 
-        for i in range(50):
-            p = person.Person(self, self.simulation_boxes[i%2])
-            self.people.append(p)
-            self.pulses.append(Pulse(p))
+        self.play = PlayScene(self)
+        self.menu = MenuScene()
 
-        random.choice(self.people).state = 1  # start with one infected
+        self.gameState = self.play
 
     def add_box(self, box):
         self.simulation_boxes.append(box)
 
     def update(self, dt):
-        self.dt = dt
-
-        for i in range(len(self.people)):
-            self.people[i].update(dt)
-            self.pulses[i].update(self.people[i], dt)
-
-        self.historyTimer += 1
-        if self.historyTimer % 3 == 0:
-            self.updateHistory()
-
-        # Handle collisions inside this box
-        Person.handleCollisions(self.people, dt)
-
+        self.gameState.update(dt)
+        
 
     def draw(self, screen):
-        self.center.draw(screen)
+        self.gameState.draw(screen)
 
-        for box in self.simulation_boxes:
-            box.draw(screen)
 
-        for i in range(len(self.people)):
-            self.people[i].draw(screen)
-            self.pulses[i].draw(self.people[i], screen)
+    def handlePulseCollisions(self, pulse):
+        for person in self.people:
+            if person.state == Person.STATE_UNINFECTED and pulse.person != person and pulse.person.state == Person.STATE_INFECTED:
+                pulseVector = pygame.Vector2(pulse.x, pulse.y)
+                distance = pulseVector.distance_to(person.pos)
+                if distance < person.size + pulse.size:
 
-        self.graph.draw(screen)
+                    maxDist = pulse.size + person.size
+                    ratio = distance / maxDist
+
+                    strength = 1-ratio
+
+                    trueRate = self.infectionRate * self.dt * strength
+
+                    person.currInfectionCount += trueRate
+                    if person.currInfectionCount >= person.infectionThreshold:
+                        person.state = Person.STATE_INFECTED
+                        print(distance, strength, person.pos, pulseVector)
+
 
 
 

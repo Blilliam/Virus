@@ -29,7 +29,7 @@ class Person:
 
         self.currInfectionCount = 0
         self.infectedTime = 0
-        self.maxInfectedTime = random.randint(900, 1200)
+        self.maxInfectedTime = random.randint(15, 20)
 
         self.centerTimer = 0
         self.centerTimerMax = random.uniform(1.0, 3.0)
@@ -60,10 +60,10 @@ class Person:
     def update(self, dt):
 
         # Infection timer
-        if self.state == 1:
+        if self.state == Person.STATE_INFECTED:
             self.infectedTime += dt
             if self.infectedTime >= self.maxInfectedTime:
-                self.state = -1
+                self.state = Person.STATE_RECOVERED
 
         # Boundary collision
 

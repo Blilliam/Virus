@@ -13,11 +13,13 @@ class Pulse:
         self.growth_speed = 60
         self.growing = True
 
-    def update(self, person, dt):
-        if person.state == 1:
+        self.person = person
+
+    def update(self, dt):
+        if self.person.state == 1:
             # Follow the person
-            self.x = person.pos.x
-            self.y = person.pos.y
+            self.x = self.person.pos.x
+            self.y = self.person.pos.y
 
             # Pulse logic
             if self.growing:
@@ -31,6 +33,6 @@ class Pulse:
 
         
 
-    def draw(self, person, screen):
-        if person.state == 1:
+    def draw(self, screen):
+        if self.person.state == 1:
             pygame.draw.circle(screen, (255, 0, 0), (int(self.x), int(self.y)), int(self.size), 2)

@@ -18,13 +18,13 @@ screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREE
 pygame.display.set_caption("Simulation Controller")
 
 # Clock
-gameSpeed = 5
+gameSpeed = 0.5
 
 clock = pygame.time.Clock()
 FPS = 60
 
 # Create game
-game = Game()
+game = Game(screen_width, screen_height)
 
 # Main loop
 running = True
