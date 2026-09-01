@@ -10,8 +10,6 @@ class Graph:
         self.x_scale_rate = 0  # how fast it squishes horizontally
         self.hit_border = False
 
-
-
         self.w = w
         self.h = h
 
@@ -53,6 +51,9 @@ class Graph:
                             [draw_x, self.y + uHeight + iHeight, 1, rHeight])
 
             bar_x += 1
+
+    def update(self, dt):
+        ...
 
 
 

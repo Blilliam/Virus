@@ -38,6 +38,8 @@ while running:
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
 
+        game.handleClick(event)
+
     game.update(dt)
 
     screen.fill((0, 128, 255))  # background

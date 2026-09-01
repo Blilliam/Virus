@@ -3,3 +3,5 @@ class Scene:
         pass
     def draw(self, screen):
         pass
+    def handleClick(self, event):
+        pass

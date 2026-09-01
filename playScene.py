@@ -34,6 +34,8 @@ class PlayScene(Scene):
         if self.game.historyTimer % 3 == 0:
             self.game.updateHistory()
 
+        self.game.graph.update(dt)
+
     def draw(self, screen):
         self.game.center.draw(screen)
 
@@ -45,3 +47,6 @@ class PlayScene(Scene):
             self.game.pulses[i].draw(screen)
 
         self.game.graph.draw(screen)
+
+    def handleClick(self, event):
+        pass

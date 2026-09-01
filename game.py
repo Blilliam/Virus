@@ -35,9 +35,9 @@ class Game:
         self.graph = Graph(self, 600, 600, 400, 400)
 
         self.play = PlayScene(self)
-        self.menu = MenuScene()
+        self.menu = MenuScene(self)
 
-        self.gameState = self.play
+        self.gameState = self.menu
 
     def add_box(self, box):
         self.simulation_boxes.append(box)
@@ -48,6 +48,9 @@ class Game:
 
     def draw(self, screen):
         self.gameState.draw(screen)
+
+    def handleClick(self, event):
+        self.gameState.handleClick(event)
 
 
     def handlePulseCollisions(self, pulse):
