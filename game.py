@@ -16,6 +16,8 @@ class Game:
 
         self.c = Config.load()
 
+        self.timeScale = 1
+
         self.screen_width = screen_width
         self.screen_height = screen_height
 
@@ -43,7 +45,8 @@ class Game:
         self.simulation_boxes.append(box)
 
     def update(self, dt):
-        self.gameState.update(dt)
+        newDt = dt * self.timeScale
+        self.gameState.update(newDt)
         
 
     def draw(self, screen):
@@ -70,7 +73,6 @@ class Game:
                     person.currInfectionCount += trueRate
                     if person.currInfectionCount >= person.infectionThreshold:
                         person.state = Person.STATE_INFECTED
-                        print(distance, strength, person.pos, pulseVector)
 
 
 

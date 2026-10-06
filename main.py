@@ -27,24 +27,22 @@ FPS = 60
 game = Game(screen_width, screen_height)
 
 # Main loop
+clock = pygame.time.Clock()
 running = True
+
 while running:
-    diffTime = clock.tick(FPS)/1000
-    dt = diffTime * gameSpeed
+    # Get frame delta time in seconds
+    dt = clock.tick(60) / 1000.0  
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            running = False
-
         game.handleClick(event)
 
     game.update(dt)
-
-    screen.fill((0, 128, 255))  # background
+    
+    screen.fill((30, 30, 30))
     game.draw(screen)
-
     pygame.display.flip()
 
 pygame.quit()

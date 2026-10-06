@@ -7,7 +7,10 @@ class Config:
 
     @staticmethod
     def load(path = "infectioninfo.toml"):
-        p = pathlib.Path(path)
+        # Resolve the directory containing config.py
+        base_dir = pathlib.Path(__file__).parent
+        p = base_dir / path
+        
         with p.open("rb") as f:
             data = tomllib.load(f)
 
