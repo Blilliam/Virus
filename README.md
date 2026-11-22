@@ -19,6 +19,9 @@ This Python project simulates a basic **virus‑spread** model in a small commun
 python -m venv .venv
 source .venv/bin/activate  # on Windows: .\.venv\Scripts\activate
 
+python -m pip install -r requirements.txt
+
+
 # Run the simulation
 python main.py
 ```
