@@ -1,41 +1,25 @@
-# Virus Project
+# Virus Simulation
 
 ## What it is
-This Python project simulates a basic **virus‑spread** model in a small community.  Each person is represented by the `Person` class, and the program runs one day‑step at a time.
+A real-time 2D Python simulation that models how a virus spreads through a moving population. Built with **Pygame** and **pygame_gui**, it features interactive parameter sliders, spatial simulation boxes, visual infection pulses, and a live population graph.
 
 ## How it works
-* **People** are stored in `main.py` and live inside a list.
-* On each day, every infected person may spread the virus to their neighbours.
-* The simulation keeps track of **susceptible**, **infected** and **recovered** people.
+- **Simulation & Scenes (`game.py`, `menuScene.py`, `playScene.py`):** Starts in an interactive menu where you can adjust simulation variables before launching the active simulation.
+- **Agents (`person.py`):** Each individual moves continuously inside simulation boxes (`box.py`) with randomized speed and heading, transitioning between states as the outbreak progresses.
+- **Transmission (`pulse.py`):** Infected individuals emit proximity pulses that check for collisions with nearby people to spread the infection.
+- **Live Tracking (`graph.py`):** Records population history over time and plots state counts visually during the run.
 
-## Features
-* Simple command‑line interface – just run `python main.py`.
-* Configurable parameters like infection chance, recovery time and population size are in `config.py`.
-* Visual output is printed to the console; each line shows how many people are in each state.
+## Configuration
+Default simulation settings (such as infection rate, infection radius, and box dimensions) are stored in `infectioninfo.toml` and loaded via `config.py`.
 
 ## Running the program
 ```bash
-# First install the virtual environment (optional but recommended)
+# Create and activate a virtual environment (recommended)
 python -m venv .venv
-source .venv/bin/activate  # on Windows: .\.venv\Scripts\activate
+source .venv/bin/activate  # On Windows: .\.venv\Scripts\activate
 
+# Install dependencies
 python -m pip install -r requirements.txt
-
 
 # Run the simulation
 python main.py
-```
-
-The program will print a short report for each day until everyone has recovered or died.
-
-## Extending the project
-Feel free to add new behaviours:
-* Add a `death` state.
-* Make the infection probability vary by age group.
-* Visualise with a simple GUI or plot the daily counts.
-
-## Contributing
-If you find bugs or want to add features, open an issue or submit a pull request.  Please keep the coding style consistent with the existing files.
-
----
-© 2026, wtscudder – Free to use under an MIT‑style license.
