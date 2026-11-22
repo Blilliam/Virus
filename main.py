@@ -30,7 +30,7 @@ game = Game(screen_width, screen_height)
 clock = pygame.time.Clock()
 running = True
 
-while running:
+while running and game.running:
     # Get frame delta time in seconds
     dt = clock.tick(60) / 1000.0  
 
@@ -39,7 +39,8 @@ while running:
             running = False
         game.handleClick(event)
 
-    game.update(dt)
+    if game.running:
+        game.update(dt)
     
     screen.fill((30, 30, 30))
     game.draw(screen)

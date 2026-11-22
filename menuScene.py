@@ -3,88 +3,109 @@ import pygame_gui
 from scene import Scene
 from playScene import PlayScene
 
+
 class MenuScene(Scene):
     def __init__(self, game):
         self.game = game
-        
-        # Initialize the UI Manager using game screen resolution
         self.manager = pygame_gui.UIManager((game.screen_width, game.screen_height))
 
-        # Read defaults from config
-        default_rate = float(game.c.get("person", "infectionRate") or 5.0)
-        default_radius = float(game.c.get("person", "infectionRadius") or 30.0)
-        default_sim_speed = getattr(game, "time_scale", 1.0)
+        self.panel_width = min(560, game.screen_width - 32)
+        self.panel_height = 570
+        self.panel_x = (game.screen_width - self.panel_width) // 2
+        self.panel_y = max(12, (game.screen_height - self.panel_height) // 2)
+        control_x = self.panel_x + 60
+        control_width = self.panel_width - 120
 
-        # Infection Rate Slider
-        self.rate_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((200, 50), (300, 30)),
-            text=f"Infection Rate: {default_rate:.1f}",
-            manager=self.manager
-        )
-        self.rate_slider = pygame_gui.elements.UIHorizontalSlider(
-            relative_rect=pygame.Rect((200, 80), (300, 30)),
-            start_value=default_rate,
-            value_range=(1.0, 20.0),
+        self.title = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect((self.panel_x + 20, self.panel_y + 12),
+                                      (self.panel_width - 40, 40)),
+            text="Simulation settings",
             manager=self.manager
         )
 
-        # Infection Radius Slider
-        self.radius_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((200, 130), (300, 30)),
-            text=f"Infection Radius: {default_radius:.1f}",
-            manager=self.manager
-        )
-        self.radius_slider = pygame_gui.elements.UIHorizontalSlider(
-            relative_rect=pygame.Rect((200, 160), (300, 30)),
-            start_value=default_radius,
-            value_range=(5.0, 60.0),
-            manager=self.manager
-        )
+        settings = game.settings
+        controls = [
+            ("Infection rate", "infection_rate", 0.0, 20.0, "{:.1f}"),
+            ("Infection radius", "infection_radius", 5.0, 80.0, "{:.1f} px"),
+            ("Population", "population", 10.0, 150.0, "{:.0f}"),
+            ("Infection threshold", "infection_threshold", 0.1, 2.0, "{:.2f}"),
+            ("Recovery time", "recovery_time", 5.0, 60.0, "{:.0f} s"),
+            ("Movement speed", "movement_speed", 0.25, 2.0, "{:.2f}x"),
+            ("Simulation speed", "simulation_speed", 0.1, 5.0, "{:.1f}x"),
+        ]
 
-        # Simulation Speed (dt multiplier) Slider
-        self.sim_speed_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((200, 210), (300, 30)),
-            text=f"Sim Speed: {default_sim_speed:.1f}x",
-            manager=self.manager
-        )
-        self.sim_speed_slider = pygame_gui.elements.UIHorizontalSlider(
-            relative_rect=pygame.Rect((200, 240), (300, 30)),
-            start_value=default_sim_speed,
-            value_range=(0.1, 5.0),
-            manager=self.manager
-        )
+        self.sliders = {}
+        self.labels = {}
+        for index, (label, key, minimum, maximum, value_format) in enumerate(controls):
+            y = self.panel_y + 58 + index * 64
+            self.labels[key] = pygame_gui.elements.UILabel(
+                relative_rect=pygame.Rect((control_x, y), (control_width, 26)),
+                text="",
+                manager=self.manager
+            )
+            self.sliders[key] = pygame_gui.elements.UIHorizontalSlider(
+                relative_rect=pygame.Rect((control_x, y + 27), (control_width, 24)),
+                start_value=settings[key],
+                value_range=(minimum, maximum),
+                manager=self.manager
+            )
+            self.labels[key].set_text(
+                f"{label}: {value_format.format(settings[key])}"
+            )
 
-        # Play Button
+        button_y = self.panel_y + self.panel_height - 62
         self.play_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((250, 310), (200, 50)),
-            text="Play",
+            relative_rect=pygame.Rect((control_x, button_y), (control_width // 2 - 6, 42)),
+            text="Start simulation",
             manager=self.manager
         )
+        self.reset_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((control_x + control_width // 2 + 6, button_y),
+                                      (control_width // 2 - 6, 42)),
+            text="Reset defaults",
+            manager=self.manager
+        )
+        self.quit_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((self.panel_x + self.panel_width - 54,
+                                       self.panel_y + 15), (36, 34)),
+            text="X",
+            manager=self.manager
+        )
+        self.controls = controls
 
     def draw(self, screen):
+        pygame.draw.rect(
+            screen, (25, 31, 42),
+            (self.panel_x, self.panel_y, self.panel_width, self.panel_height),
+            border_radius=14
+        )
+        pygame.draw.rect(
+            screen, (72, 88, 110),
+            (self.panel_x, self.panel_y, self.panel_width, self.panel_height),
+            width=2, border_radius=14
+        )
         self.manager.draw_ui(screen)
 
     def update(self, dt):
-        # Update manager timer
         self.manager.update(dt)
-
-        # Dynamically update labels when sliders move
-        self.rate_label.set_text(f"Infection Rate: {self.rate_slider.get_current_value():.1f}")
-        self.radius_label.set_text(f"Infection Radius: {self.radius_slider.get_current_value():.1f}")
-        self.sim_speed_label.set_text(f"Sim Speed: {self.sim_speed_slider.get_current_value():.1f}x")
+        for label, key, _, _, value_format in self.controls:
+            value = self.sliders[key].get_current_value()
+            self.labels[key].set_text(f"{label}: {value_format.format(value)}")
 
     def handleClick(self, event):
-        # Pass pygame events to manager
         self.manager.process_events(event)
+        if event.type != pygame_gui.UI_BUTTON_START_PRESS:
+            return
 
-        # Detect button click
-        if event.type == pygame_gui.UI_BUTTON_START_PRESS:
-            if event.ui_element == self.play_button:
-                # Apply configured slider values
-                self.game.infectionRate = self.rate_slider.get_current_value()
-                self.game.c.data["person"]["infectionRadius"] = self.radius_slider.get_current_value()
-
-                # Reinitialize PlayScene with updated variables and launch
-                self.game.play = PlayScene(self.game)
-                self.game.time_scale = self.sim_speed_slider.get_current_value()
-                self.game.gameState = self.game.play
+        if event.ui_element == self.reset_button:
+            for key, slider in self.sliders.items():
+                slider.set_current_value(self.game.default_settings[key])
+        elif event.ui_element == self.quit_button:
+            self.game.running = False
+        elif event.ui_element == self.play_button:
+            for key, slider in self.sliders.items():
+                value = slider.get_current_value()
+                self.game.settings[key] = int(round(value)) if key == "population" else value
+            self.game.timeScale = self.game.settings["simulation_speed"]
+            self.game.play = PlayScene(self.game)
+            self.game.gameState = self.game.play

@@ -7,11 +7,14 @@ width = 400
 height = 400
 
 [population]
+count = 50
 
 [person]
 personRadius = 10
 infectionRadius = 30
 infectionThreshold = 0.5
 infectionRate = 5
+recoveryTime = 18
+movementSpeed = 1.0
 
 

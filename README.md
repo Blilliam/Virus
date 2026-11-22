@@ -10,7 +10,7 @@ A real-time 2D Python simulation that models how a virus spreads through a movin
 - **Live Tracking (`graph.py`):** Records population history over time and plots state counts visually during the run.
 
 ## Configuration
-Default simulation settings (such as infection rate, infection radius, and box dimensions) are stored in `infectioninfo.toml` and loaded via `config.py`.
+Default simulation settings (such as population, infection rate, infection radius, recovery time, movement speed, and box dimensions) are stored in `infectioninfo.toml` and loaded via `config.py`. Before starting, the menu lets you adjust infection rate, infection radius, population, infection threshold, recovery time, movement speed, and simulation speed. Use **Reset defaults** to restore the configured values.
 
 ## Running the program
 ```bash

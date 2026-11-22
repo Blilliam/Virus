@@ -1,15 +1,9 @@
-import random
-from turtle import width
 import pygame
-from playScene import PlayScene
-from box import Box
 from center import Center
 from config import Config
 from graph import Graph
 from menuScene import MenuScene
-import person
 from person import Person
-from pulse import Pulse
 
 class Game:
     def __init__(self, screen_width, screen_height):
@@ -21,7 +15,17 @@ class Game:
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        self.infectionRate = self.c.get("person", "infectionRate")
+        self.default_settings = {
+            "infection_rate": float(self.c.get("person", "infectionRate", default=5)),
+            "infection_radius": float(self.c.get("person", "infectionRadius", default=30)),
+            "population": int(self.c.get("population", "count", default=50)),
+            "infection_threshold": float(self.c.get("person", "infectionThreshold", default=0.5)),
+            "recovery_time": float(self.c.get("person", "recoveryTime", default=18)),
+            "movement_speed": float(self.c.get("person", "movementSpeed", default=1.0)),
+            "simulation_speed": 1.0,
+        }
+        self.settings = self.default_settings.copy()
+        self.running = True
 
         self.simulation_boxes = []
 
@@ -36,7 +40,6 @@ class Game:
 
         self.graph = Graph(self, 600, 600, 400, 400)
 
-        self.play = PlayScene(self)
         self.menu = MenuScene(self)
 
         self.gameState = self.menu
@@ -53,7 +56,8 @@ class Game:
         self.gameState.draw(screen)
 
     def handleClick(self, event):
-        self.gameState.handleClick(event)
+        if self.gameState:
+            self.gameState.handleClick(event)
 
 
     def handlePulseCollisions(self, pulse):
@@ -68,7 +72,7 @@ class Game:
 
                     strength = 1-ratio
 
-                    trueRate = self.infectionRate * self.dt * strength
+                    trueRate = self.settings["infection_rate"] * self.dt * strength
 
                     person.currInfectionCount += trueRate
                     if person.currInfectionCount >= person.infectionThreshold:

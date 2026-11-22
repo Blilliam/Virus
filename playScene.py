@@ -12,10 +12,16 @@ class PlayScene(Scene):
         boxHeight = game.c.get("box", "height")
         boxWidth = game.c.get("box", "width")
 
+        game.simulation_boxes.clear()
+        game.people.clear()
+        game.pulses.clear()
+        game.history.clear()
+        game.historyTimer = 0
+
         game.add_box(Box(50, 50, boxWidth, boxHeight, self))
         game.add_box(Box(50, 600, boxWidth, boxHeight, self))
 
-        for i in range(50):
+        for i in range(game.settings["population"]):
             p = person.Person(game, game.simulation_boxes[i%2])
             game.people.append(p)
             game.pulses.append(Pulse(p))

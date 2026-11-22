@@ -1,7 +1,6 @@
 import math
 import random
 import pygame
-from config import Config
 
 class Person:
     STATE_INFECTED = 1
@@ -14,22 +13,20 @@ class Person:
     STATE_DASH_BACK = "STATE_DASH_BACK"
 
     def __init__(self, game, box):
-        c = Config.load()
-
         # 0: uninfected, 1: infected, -1: recovered
         self.state = 0
         self.movementState = self.STATE_NORMAL
 
-        self.size = c.get("person", "personRadius")
+        self.size = game.c.get("person", "personRadius")
         self.game = game
         self.box = box
 
-        self.infectionRadius = c.get("person", "infectionRadius")
-        self.infectionThreshold = c.get("person", "infectionThreshold")
+        self.infectionRadius = game.settings["infection_radius"]
+        self.infectionThreshold = game.settings["infection_threshold"]
 
         self.currInfectionCount = 0
         self.infectedTime = 0
-        self.maxInfectedTime = random.randint(15, 20)
+        self.maxInfectedTime = game.settings["recovery_time"]
 
         self.centerTimer = 0
         self.centerTimerMax = random.uniform(1.0, 3.0)
@@ -46,8 +43,8 @@ class Person:
         # Movement system
         self.theta = random.uniform(0, 2 * math.pi)
 
-        self.min_speed = 18
-        self.max_speed = 72
+        self.min_speed = 18 * game.settings["movement_speed"]
+        self.max_speed = 72 * game.settings["movement_speed"]
         self.speed = random.uniform(self.min_speed, self.max_speed)
 
         self.accel_sigma = 0.05
@@ -92,7 +89,8 @@ class Person:
             #self.game.center.y + (self.game.center.height/2)
             expectedPoint = pygame.Vector2(self.game.center.x + (self.game.center.width/2), self.game.center.y + (self.game.center.height/2))
             self.dashTimer+= dt
-            if (self.dashTimer >= self.dashTimerMax / dt or self.moveTo(expectedPoint, 500, dt)):
+            if (self.dashTimer >= self.dashTimerMax / dt or
+                    self.moveTo(expectedPoint, 500 * self.game.settings["movement_speed"], dt)):
                 self.movementState = self.STATE_IN_POINT
                 self.dashTimer = 0
 
@@ -101,7 +99,8 @@ class Person:
             #self.game.center.y + (self.game.center.height/2)
             expectedPoint = pygame.Vector2(self.box.x + (self.box.width/2), self.box.y + (self.box.height/2))
             self.dashTimer+= dt
-            if (self.dashTimer >= self.dashTimerMax / dt or self.moveTo(expectedPoint, 500, dt)):
+            if (self.dashTimer >= self.dashTimerMax / dt or
+                    self.moveTo(expectedPoint, 500 * self.game.settings["movement_speed"], dt)):
                 self.movementState = self.STATE_NORMAL
                 self.dashTimer = 0
             
